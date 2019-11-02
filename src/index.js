@@ -7,7 +7,11 @@ class TypeWriterEffect extends Component {
     text: '',
     blink: false,
     hideCursor: true,
-    animate: false
+    animate: false,
+    typeSpeedDelay: null,
+    multiTextDelay: null,
+    eraseSpeedDelay: null,
+    startDelay: null,
   };
 
   myRef = createRef();
@@ -22,20 +26,27 @@ class TypeWriterEffect extends Component {
     const textArr = typeof str == 'string' && str.trim().split('');
     if (textArr) {
       this.setState({
-        blink: false
+        blink: false,
       });
       let text = '';
+      const typeSpeedDelay = new delay(this.props.typeSpeed || 120);
+      const multiTextDelay =
+        this.props.multiText && new delay(this.props.multiTextDelay || 2000);
+      this.setState({
+        typeSpeedDelay,
+        multiTextDelay,
+      });
       for (let char = 0; char < textArr.length; char++) {
-        await delay(this.props.typeSpeed || 120);
+        await typeSpeedDelay.getPromise();
         text += textArr[char];
         this.setState({
-          text
+          text,
         });
       }
       this.setState({
-        blink: true
+        blink: true,
       });
-      this.props.multiText && (await delay(this.props.multiTextDelay || 2000));
+      this.props.multiText && (await multiTextDelay.getPromise());
       erase > 0 && (await this.eraseText(text));
     }
   };
@@ -43,40 +54,48 @@ class TypeWriterEffect extends Component {
   eraseText = async str => {
     const textArr = typeof str == 'string' && str.trim().split('');
     this.setState({
-      blink: false
+      blink: false,
     });
     let text = str.trim();
+    const eraseSpeedDelay = new delay(50);
+    this.setState({
+      eraseSpeedDelay,
+    });
     for (let char = 0; char < textArr.length; char++) {
-      await delay(50);
+      await eraseSpeedDelay.getPromise();
       text = text.slice(0, -1);
       this.setState({
-        text
+        text,
       });
     }
     this.setState({
-      blink: true
+      blink: true,
     });
   };
 
   animateOnScroll = async () => {
-    if (!this.state.animate && contentInView(this.myRef.current)) {
-      this.setState({
-        animate: true
-      });
-      this.props.startDelay && (await delay(this.props.startDelay));
-      this.setState({
-        hideCursor: false
-      });
-
-      this.props.multiText
-        ? await this.multiTextDisplay(this.props.multiText)
-        : await this.runAnimation(this.props.text);
-
-      this.props.hideCursorAfterText &&
+    try {
+      if (!this.state.animate && contentInView(this.myRef.current)) {
         this.setState({
-          hideCursor: true
+          animate: true,
         });
-    }
+        const startDelay =
+          this.props.startDelay && new delay(this.props.startDelay);
+        this.setState({
+          hideCursor: false,
+          startDelay,
+        });
+        this.props.startDelay && (await startDelay.getPromise());
+        this.props.multiText
+          ? await this.multiTextDisplay(this.props.multiText)
+          : await this.runAnimation(this.props.text);
+
+        this.props.hideCursorAfterText &&
+          this.setState({
+            hideCursor: true,
+          });
+      }
+    } catch (error) {}
   };
 
   componentDidMount() {
@@ -85,7 +104,12 @@ class TypeWriterEffect extends Component {
   }
 
   componentWillUnmount() {
+    // unsubscribe from timeouts and events
     document.removeEventListener('scroll', this.animateOnScroll);
+    this.state.startDelay && this.state.startDelay.cancel();
+    this.state.eraseSpeedDelay && this.state.eraseSpeedDelay.cancel();
+    this.state.typeSpeedDelay && this.state.typeSpeedDelay.cancel();
+    this.state.multiTextDelay && this.state.multiTextDelay.cancel();
   }
 
   render() {
