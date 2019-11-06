@@ -95,6 +95,12 @@ export const propTypeValidation = {
         `Invalid ${propName} supplied to react-typeWriter component!`
       );
   },
+  scrollArea: (props, propName) => {
+    if (props[propName] && typeof props[propName] != 'object')
+      return new Error(
+        `Invalid ${propName} supplied to typewriter component!`
+      );
+  },
 };
 
 export const contentInView = element => {

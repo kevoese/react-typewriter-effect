@@ -12,6 +12,7 @@ class TypeWriterEffect extends Component {
     multiTextDelay: null,
     eraseSpeedDelay: null,
     startDelay: null,
+    scrollAreaIsSet: null,
   };
 
   myRef = createRef();
@@ -100,12 +101,26 @@ class TypeWriterEffect extends Component {
 
   componentDidMount() {
     this.animateOnScroll();
-    document.addEventListener('scroll', this.animateOnScroll);
+    this.setState({ scrollAreaIsSet: false });
+  }
+
+  componentDidUpdate() {
+    if (!this.state.scrollAreaIsSet) {
+      this.setState({ scrollAreaIsSet: true });
+      (this.props.scrollArea && typeof this.props.scrollArea == 'object')
+        ? this.props.scrollArea.addEventListener('scroll', this.animateOnScroll)
+        : document.addEventListener('scroll', this.animateOnScroll);
+    }
   }
 
   componentWillUnmount() {
     // unsubscribe from timeouts and events
-    document.removeEventListener('scroll', this.animateOnScroll);
+    (this.props.scrollArea && typeof this.props.scrollArea == 'object')
+    ? this.props.scrollArea.removeEventListener(
+        'scroll',
+        this.animateOnScroll
+      )
+    : document.removeEventListener('scroll', this.animateOnScroll);
     this.state.startDelay && this.state.startDelay.cancel();
     this.state.eraseSpeedDelay && this.state.eraseSpeedDelay.cancel();
     this.state.typeSpeedDelay && this.state.typeSpeedDelay.cancel();
