@@ -16,6 +16,7 @@ class TypeWriterEffect extends Component {
   };
 
   myRef = createRef();
+  scrollRef = createRef();
 
   multiTextDisplay = async arr => {
     for (let e = 0; e < arr.length; e++) {
@@ -77,6 +78,10 @@ class TypeWriterEffect extends Component {
   animateOnScroll = async () => {
     try {
       if (!this.state.animate && contentInView(this.myRef.current)) {
+        this.scrollRef.current.removeEventListener(
+          'scroll',
+          this.animateOnScroll
+        );
         this.setState({
           animate: true,
         });
@@ -107,20 +112,17 @@ class TypeWriterEffect extends Component {
   componentDidUpdate() {
     if (!this.state.scrollAreaIsSet) {
       this.setState({ scrollAreaIsSet: true });
-      (this.props.scrollArea && typeof this.props.scrollArea == 'object')
-        ? this.props.scrollArea.addEventListener('scroll', this.animateOnScroll)
-        : document.addEventListener('scroll', this.animateOnScroll);
+      this.scrollRef.current =
+        this.props.scrollArea && typeof this.props.scrollArea == 'object'
+          ? this.props.scrollArea
+          : document;
+      this.scrollRef.current.addEventListener('scroll', this.animateOnScroll);
     }
   }
 
   componentWillUnmount() {
     // unsubscribe from timeouts and events
-    (this.props.scrollArea && typeof this.props.scrollArea == 'object')
-    ? this.props.scrollArea.removeEventListener(
-        'scroll',
-        this.animateOnScroll
-      )
-    : document.removeEventListener('scroll', this.animateOnScroll);
+    this.scrollRef.current.removeEventListener('scroll', this.animateOnScroll);
     this.state.startDelay && this.state.startDelay.cancel();
     this.state.eraseSpeedDelay && this.state.eraseSpeedDelay.cancel();
     this.state.typeSpeedDelay && this.state.typeSpeedDelay.cancel();

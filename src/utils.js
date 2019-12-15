@@ -20,27 +20,6 @@ export class delay {
   }
 }
 
-export class makeCancelable {
-  constructor(promise) {
-    this.promise = promise;
-    this.close = null;
-  }
-
-  getPromise() {
-    return new Promise((resolve, reject) => {
-      this.close = reject('rejected promise');
-      this.promise()
-        .then(val => resolve(val))
-        .catch(err => reject(err));
-    });
-  }
-  cancel() {
-    this.close && this.close();
-     throw new Error('error');
-    return { isCanceled: true };
-  }
-}
-
 export const propTypeValidation = {
   multiTextDelay: (props, propName) => {
     if (props[propName] && typeof props[propName] != 'number')
@@ -97,9 +76,7 @@ export const propTypeValidation = {
   },
   scrollArea: (props, propName) => {
     if (props[propName] && typeof props[propName] != 'object')
-      return new Error(
-        `Invalid ${propName} supplied to typewriter component!`
-      );
+      return new Error(`Invalid ${propName} supplied to typewriter component!`);
   },
 };
 
@@ -114,9 +91,10 @@ export const contentInView = element => {
   };
 
   const elementPosition = {
-    top: elementTopPosition,
-    bottom: elementTopPosition + elementPositionProps.height,
+    top: Math.floor(elementTopPosition),
+    bottom: Math.floor(elementTopPosition + elementPositionProps.height),
   };
+
   return (
     (elementPosition.bottom >= viewport.top &&
       elementPosition.bottom <= viewport.bottom) ||
