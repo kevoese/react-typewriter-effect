@@ -30,13 +30,13 @@ export class makeCancelable {
     return new Promise((resolve, reject) => {
       this.close = reject('rejected promise');
       this.promise()
-        .then(val => resolve(val))
-        .catch(err => reject(err));
+        .then((val) => resolve(val))
+        .catch((err) => reject(err));
     });
   }
   cancel() {
     this.close && this.close();
-     throw new Error('error');
+    // throw new Error('error');
     return { isCanceled: true };
   }
 }
@@ -97,13 +97,17 @@ export const propTypeValidation = {
   },
   scrollArea: (props, propName) => {
     if (props[propName] && typeof props[propName] != 'object')
+      return new Error(`Invalid ${propName} supplied to typewriter component!`);
+  },
+  multiTextLoop: (props, propName) => {
+    if (props[propName] && typeof props[propName] != 'boolean')
       return new Error(
-        `Invalid ${propName} supplied to typewriter component!`
+        `Invalid ${propName} supplied to react-typeWriter component.`
       );
   },
 };
 
-export const contentInView = element => {
+export const contentInView = (element) => {
   const scroll = window.scrollY || window.pageYOffset;
   const elementPositionProps = element.getBoundingClientRect();
   const elementTopPosition = elementPositionProps.top + scroll;

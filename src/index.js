@@ -13,13 +13,18 @@ class TypeWriterEffect extends Component {
     eraseSpeedDelay: null,
     startDelay: null,
     scrollAreaIsSet: null,
+    multiTextLoop: false,
   };
 
   myRef = createRef();
 
-  multiTextDisplay = async arr => {
+  multiTextDisplay = async (arr) => {
     for (let e = 0; e < arr.length; e++) {
       await this.runAnimation(arr[e], arr.length - e - 1);
+    }
+    if (this.props.multiTextLoop) {
+      await this.eraseText(arr[arr.length - 1]);
+      this.multiTextDisplay(arr);
     }
   };
 
@@ -52,7 +57,7 @@ class TypeWriterEffect extends Component {
     }
   };
 
-  eraseText = async str => {
+  eraseText = async (str) => {
     const textArr = typeof str == 'string' && str.trim().split('');
     this.setState({
       blink: false,
@@ -107,7 +112,7 @@ class TypeWriterEffect extends Component {
   componentDidUpdate() {
     if (!this.state.scrollAreaIsSet) {
       this.setState({ scrollAreaIsSet: true });
-      (this.props.scrollArea && typeof this.props.scrollArea == 'object')
+      this.props.scrollArea && typeof this.props.scrollArea == 'object'
         ? this.props.scrollArea.addEventListener('scroll', this.animateOnScroll)
         : document.addEventListener('scroll', this.animateOnScroll);
     }
@@ -115,12 +120,12 @@ class TypeWriterEffect extends Component {
 
   componentWillUnmount() {
     // unsubscribe from timeouts and events
-    (this.props.scrollArea && typeof this.props.scrollArea == 'object')
-    ? this.props.scrollArea.removeEventListener(
-        'scroll',
-        this.animateOnScroll
-      )
-    : document.removeEventListener('scroll', this.animateOnScroll);
+    this.props.scrollArea && typeof this.props.scrollArea == 'object'
+      ? this.props.scrollArea.removeEventListener(
+          'scroll',
+          this.animateOnScroll
+        )
+      : document.removeEventListener('scroll', this.animateOnScroll);
     this.state.startDelay && this.state.startDelay.cancel();
     this.state.eraseSpeedDelay && this.state.eraseSpeedDelay.cancel();
     this.state.typeSpeedDelay && this.state.typeSpeedDelay.cancel();
@@ -132,14 +137,13 @@ class TypeWriterEffect extends Component {
       <div ref={this.myRef} className={'react-typewriter-text-wrap'}>
         <h1
           style={{ ...this.props.textStyle }}
-          className="react-typewriter-text"
+          className='react-typewriter-text'
         >
           {this.state.text}
           <div
-            className={`react-typewriter-pointer ${this.state.blink &&
-              'add-cursor-animate'} ${
-              this.state.hideCursor ? 'hide-typing-cursor' : ''
-            }`}
+            className={`react-typewriter-pointer ${
+              this.state.blink && 'add-cursor-animate'
+            } ${this.state.hideCursor ? 'hide-typing-cursor' : ''}`}
             style={{ backgroundColor: `${this.props.cursorColor}` }}
           ></div>
         </h1>
