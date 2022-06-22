@@ -91,7 +91,7 @@ import TypeWriterEffect from 'react-typewriter-effect';
 
 - multiTextDelay (must be a number): delay before each text is erased in multi text display in milli seconds.
 
-- multiTextLoop creates a continous loop of the typewriter text
+- multiTextLoop creates a continous loop of the typewriter text (true/false)
 
 - typeSpeed (must be a number): Speed of typing in milli seconds,
 
