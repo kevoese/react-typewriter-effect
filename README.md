@@ -87,21 +87,23 @@ import TypeWriterEffect from 'react-typewriter-effect';
 
 - text (must be a string): Required in sigle text display mode. The text in string.
 
-- multiText (array of string): Required in multi text mode
+- multiText (array of string): Required in multi text mode.
 
-- multiTextDelay (must be a number): delay before each text is erased in multi text display in milli seconds.
+- multiTextDelay (must be a number): delay before each text is erased in multi text display in milliseconds.
 
-- multiTextLoop creates a continous loop of the typewriter text (true/false)
+- multiTextLoop creates a continous loop of the typewriter text (true/false).
 
-- typeSpeed (must be a number): Speed of typing in milli seconds,
+- typeSpeed (must be a number): Speed of typing in milliseconds.
 
-- startDelay (must be a number): Delay before animation starts in milli seconds
+- startDelay (must be a number): Delay before animation starts in milliseconds.
 
 - hideCursorAfterText (a boolean): it removes cursor after typing.
 
-- cursorColor (must be a string): color of the cursor
+- cursorColor (must be a string): color of the cursor.
+
+- elementType (a string or a React component): the element/component that will be wrapped around the typewriter-effect text.  Defaults to H1.
 
 - textStyle (must be an object): custom css styles can be applied to the text in this object.
 
-- scrollArea (must be a dom element): the scrollable area. By default it is document
+- scrollArea (must be a dom element): the scrollable area. By default it is the document.
 
