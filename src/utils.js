@@ -76,6 +76,12 @@ export const propTypeValidation = {
         `Invalid ${propName} supplied to react-typeWriter component!`
       );
   },
+  elementType: (props, propName) => {
+    if (props[propName] && typeof props[propName] != 'string' && typeof props[propName] != 'function')
+      return new Error(
+        `Invalid ${propName} supplied to react-typeWriter component!`
+      );
+  },
   textStyle: (props, propName) => {
     if (props[propName] && typeof props[propName] != 'object')
       return new Error(
